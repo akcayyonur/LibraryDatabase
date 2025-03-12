@@ -1,0 +1,99 @@
+create or replace  PACKAGE LibraryPkg AS
+    -- Kullanıcı ekleme
+    PROCEDURE AddUser(
+        p_UserID IN NUMBER,
+        p_F_Name IN VARCHAR2,
+        p_L_Name IN VARCHAR2,
+        p_Email IN VARCHAR2,
+        p_Phone IN VARCHAR2,
+        p_Address IN VARCHAR2
+    );
+
+    -- Yazar ekleme
+    PROCEDURE AddAuthor(
+        p_AuthorID IN NUMBER,
+        p_Auth_Name IN VARCHAR2,
+        p_Auth_LName IN VARCHAR2,
+        p_Biography IN CLOB
+    );
+
+    -- Yayıncı ekleme
+    PROCEDURE AddPublisher(
+        p_PublisherID IN NUMBER,
+        p_PublisherName IN VARCHAR2,
+        p_Contact IN VARCHAR2,
+        p_CategoryID IN NUMBER
+    );
+
+    -- Kategori ekleme
+    PROCEDURE AddCategory(
+        p_CategoryID IN NUMBER,
+        p_CategoryName IN VARCHAR2
+    );
+
+    -- Kitap ekleme
+    PROCEDURE AddBook(
+        p_BookID IN NUMBER,
+        p_Title IN VARCHAR2,
+        p_AuthorID IN NUMBER,
+        p_PublisherID IN NUMBER,
+        p_ISBN IN VARCHAR2,
+        p_Year IN NUMBER
+    );
+
+    -- Kitap türü ekleme
+    PROCEDURE AddGenre(
+        p_GenreID IN NUMBER,
+        p_GenreName IN VARCHAR2
+    );
+
+    -- Kitap-genre bağlantısı ekleme
+    PROCEDURE AddBookGenre(
+        p_BookID IN NUMBER,
+        p_GenreID IN NUMBER
+    );
+
+    -- Ödünç alma ekleme
+    PROCEDURE AddLoan(
+        p_LoanID IN NUMBER,
+        p_UserID IN NUMBER,
+        p_BookID IN NUMBER,
+        p_IssueDate IN DATE,
+        p_DueDate IN DATE,
+        p_ReturnDate IN DATE
+    );
+
+    -- Rezervasyon ekleme
+    PROCEDURE AddReservation(
+        p_ReservationID IN NUMBER,
+        p_UserID IN NUMBER,
+        p_BookID IN NUMBER,
+        p_Resrv_Date IN DATE
+    );
+
+    -- Ceza ekleme
+    PROCEDURE AddFine(
+        p_FineID IN NUMBER,
+        p_LoanID IN NUMBER,
+        p_Amount IN NUMBER,
+        p_Status IN VARCHAR2
+    );
+
+    -- Kütüphaneci ekleme
+    PROCEDURE AddLibrarian(
+        p_LibrarianID IN NUMBER,
+        p_Libn_Name IN VARCHAR2,
+        p_Lib_LName IN VARCHAR2,
+        p_Phone IN VARCHAR2,
+        p_Email IN VARCHAR2
+    );
+
+    -- İşlem ekleme
+    PROCEDURE AddTransaction(
+        p_TransactionID IN NUMBER,
+        p_Operation IN VARCHAR2,
+        p_TableName IN VARCHAR2,
+        p_RecordID IN NUMBER,
+        p_Timestamp IN DATE,
+        p_LibrarianID IN NUMBER
+    );
