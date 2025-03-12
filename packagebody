@@ -1,0 +1,295 @@
+ create or replace NONEDITIONABLE PACKAGE BODY LibraryPkg AS
+
+    -- Kullanıcı ekleme
+    PROCEDURE AddUser(
+        p_UserID IN NUMBER,
+        p_F_Name IN VARCHAR2,
+        p_L_Name IN VARCHAR2,
+        p_Email IN VARCHAR2,
+        p_Phone IN VARCHAR2,
+        p_Address IN VARCHAR2
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Kullanıcı ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Users WHERE UserID = p_UserID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Kullanıcı zaten var.');
+        ELSE
+            -- Kullanıcıyı ekle
+            INSERT INTO Users (UserID, F_Name, L_Name, Email, Phone, Address)
+            VALUES (p_UserID, p_F_Name, p_L_Name, p_Email, p_Phone, p_Address);
+            COMMIT;
+        END IF;
+    END AddUser;
+
+    -- Yazar ekleme
+    PROCEDURE AddAuthor(
+        p_AuthorID IN NUMBER,
+        p_Auth_Name IN VARCHAR2,
+        p_Auth_LName IN VARCHAR2,
+        p_Biography IN CLOB
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Yazar ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Authors WHERE AuthorID = p_AuthorID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Yazar zaten var.');
+        ELSE
+            -- Yazarı ekle
+            INSERT INTO Authors (AuthorID, Auth_Name, Auth_LName, Biography)
+            VALUES (p_AuthorID, p_Auth_Name, p_Auth_LName, p_Biography);
+            COMMIT;
+        END IF;
+    END AddAuthor;
+
+    -- Yayıncı ekleme
+    PROCEDURE AddPublisher(
+        p_PublisherID IN NUMBER,
+        p_PublisherName IN VARCHAR2,
+        p_Contact IN VARCHAR2,
+        p_CategoryID IN NUMBER
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Yayıncı ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Publishers WHERE PublisherID = p_PublisherID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Yayıncı zaten var.');
+        ELSE
+            -- Yayıncıyı ekle
+            INSERT INTO Publishers (PublisherID, PublisherName, Contact, CategoryID)
+            VALUES (p_PublisherID, p_PublisherName, p_Contact, p_CategoryID);
+            COMMIT;
+        END IF;
+    END AddPublisher;
+
+    -- Kategori ekleme
+    PROCEDURE AddCategory(
+        p_CategoryID IN NUMBER,
+        p_CategoryName IN VARCHAR2
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Kategori ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Categories WHERE CategoryID = p_CategoryID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Kategori zaten var.');
+        ELSE
+            -- Kategoriyi ekle
+            INSERT INTO Categories (CategoryID, CategoryName)
+            VALUES (p_CategoryID, p_CategoryName);
+            COMMIT;
+        END IF;
+    END AddCategory;
+
+    -- Kitap ekleme
+    PROCEDURE AddBook(
+        p_BookID IN NUMBER,
+        p_Title IN VARCHAR2,
+        p_AuthorID IN NUMBER,
+        p_PublisherID IN NUMBER,
+        p_ISBN IN VARCHAR2,
+        p_Year IN NUMBER
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Kitap ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Books WHERE BookID = p_BookID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Kitap zaten var.');
+        ELSE
+            -- Kitabı ekle
+            INSERT INTO Books (BookID, Title, AuthorID, PublisherID, ISBN, Year)
+            VALUES (p_BookID, p_Title, p_AuthorID, p_PublisherID, p_ISBN, p_Year);
+            COMMIT;
+        END IF;
+    END AddBook;
+
+    -- Kitap türü ekleme
+    PROCEDURE AddGenre(
+        p_GenreID IN NUMBER,
+        p_GenreName IN VARCHAR2
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Genre ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Genres WHERE GenreID = p_GenreID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Tür zaten var.');
+        ELSE
+            -- Türü ekle
+            INSERT INTO Genres (GenreID, GenreName)
+            VALUES (p_GenreID, p_GenreName);
+            COMMIT;
+        END IF;
+    END AddGenre;
+
+    -- Kitap-genre bağlantısı ekleme
+    PROCEDURE AddBookGenre(
+        p_BookID IN NUMBER,
+        p_GenreID IN NUMBER
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Kitap-genre bağlantısının mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM BookGenres WHERE BookID = p_BookID AND GenreID = p_GenreID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Bu kitap ve tür bağlantısı zaten var.');
+        ELSE
+            -- Kitap-genre bağlantısını ekle
+            INSERT INTO BookGenres (BookID, GenreID)
+            VALUES (p_BookID, p_GenreID);
+            COMMIT;
+        END IF;
+    END AddBookGenre;
+
+    -- Ödünç alma ekleme
+    PROCEDURE AddLoan(
+        p_LoanID IN NUMBER,
+        p_UserID IN NUMBER,
+        p_BookID IN NUMBER,
+        p_IssueDate IN DATE,
+        p_DueDate IN DATE,
+        p_ReturnDate IN DATE
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Ödünç ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Loans WHERE LoanID = p_LoanID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Ödünç işlemi zaten var.');
+        ELSE
+            -- Ödüncü ekle
+            INSERT INTO Loans (LoanID, UserID, BookID, IssueDate, DueDate, ReturnDate)
+            VALUES (p_LoanID, p_UserID, p_BookID, p_IssueDate, p_DueDate, p_ReturnDate);
+            COMMIT;
+        END IF;
+    END AddLoan;
+
+    -- Rezervasyon ekleme
+    PROCEDURE AddReservation(
+        p_ReservationID IN NUMBER,
+        p_UserID IN NUMBER,
+        p_BookID IN NUMBER,
+        p_Resrv_Date IN DATE
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Rezervasyon ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Reservations WHERE ReservationID = p_ReservationID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Rezervasyon zaten var.');
+        ELSE
+            -- Rezervasyonu ekle
+            INSERT INTO Reservations (ReservationID, UserID, BookID, Resrv_Date)
+            VALUES (p_ReservationID, p_UserID, p_BookID, p_Resrv_Date);
+            COMMIT;
+        END IF;
+    END AddReservation;
+
+    -- Ceza ekleme
+    PROCEDURE AddFine(
+        p_FineID IN NUMBER,
+        p_LoanID IN NUMBER,
+        p_Amount IN NUMBER,
+        p_Status IN VARCHAR2
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Ceza ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Fines WHERE FineID = p_FineID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Ceza zaten var.');
+        ELSE
+            -- Cezayı ekle
+            INSERT INTO Fines (FineID, LoanID, Amount, Status)
+            VALUES (p_FineID, p_LoanID, p_Amount, p_Status);
+            COMMIT;
+        END IF;
+    END AddFine;
+
+    -- Kütüphaneci ekleme
+    PROCEDURE AddLibrarian(
+        p_LibrarianID IN NUMBER,
+        p_Libn_Name IN VARCHAR2,
+        p_Lib_LName IN VARCHAR2,
+        p_Phone IN VARCHAR2,
+        p_Email IN VARCHAR2
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- Kütüphaneci ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Librarians WHERE LibrarianID = p_LibrarianID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: Kütüphaneci zaten var.');
+        ELSE
+            -- Kütüphaneciyi ekle
+            INSERT INTO Librarians (LibrarianID, Libn_Name, Lib_LName, Phone, Email)
+            VALUES (p_LibrarianID, p_Libn_Name, p_Lib_LName, p_Phone, p_Email);
+            COMMIT;
+        END IF;
+    END AddLibrarian;
+
+    -- İşlem ekleme
+    PROCEDURE AddTransaction(
+        p_TransactionID IN NUMBER,
+        p_Operation IN VARCHAR2,
+        p_TableName IN VARCHAR2,
+        p_RecordID IN NUMBER,
+        p_Timestamp IN DATE,
+        p_LibrarianID IN NUMBER
+    ) IS
+        v_count NUMBER;
+    BEGIN
+        -- İşlem ID'nin mevcut olup olmadığını kontrol et
+        SELECT COUNT(*) INTO v_count FROM Transactions WHERE TransactionID = p_TransactionID;
+        IF v_count > 0 THEN
+            DBMS_OUTPUT.PUT_LINE('ID mevcut: İşlem zaten var.');
+        ELSE
+            -- İşlemi ekle
+            INSERT INTO Transactions (TransactionID, Operation, TableName, RecordID, Timestamp, LibrarianID)
+            VALUES (p_TransactionID, p_Operation, p_TableName, p_RecordID, p_Timestamp, p_LibrarianID);
+            COMMIT;
+        END IF;
+    END AddTransaction;
+
+
+
+        Veri Girişi
+BEGIN
+    -- Kullanıcı ekleme
+    LibraryPkg.AddUser(1, 'John', 'Doe', 'john.doe@example.com', '1234567890', '123 Main Street');
+    -- Yazar ekleme
+    LibraryPkg.AddAuthor(1, 'Mark', 'Twain', 'American writer known for Adventures of Huckleberry Finn.');
+     -- Kategori ekleme
+    LibraryPkg.AddCategory(1, 'Fiction');
+   
+    -- Yayıncı ekleme
+    LibraryPkg.AddPublisher(1, 'Penguin Books', 'contact@penguinbooks.com',1);
+    -- Kitap ekleme
+    LibraryPkg.AddBook(1, 'The Adventures of Tom Sawyer', 1, 1, '9780142437179', 1876);
+   
+    -- Ödünç alma ekleme
+    LibraryPkg.AddLoan(1, 1, 1, SYSDATE, SYSDATE + 7, NULL);  -- SYSDATE, bugünün tarihi, NULL: kitabın henüz geri verilmediği durum
+   
+    -- Rezervasyon ekleme
+    LibraryPkg.AddReservation(1, 1, 1, SYSDATE);  -- Rezervasyon tarihi olarak SYSDATE kullanılıyor
+   
+    -- Ceza ekleme
+    LibraryPkg.AddFine(1, 1, 5.00, 'Unpaid');  -- Ceza miktarı olarak 5.00 ve durum 'Unpaid' olarak ekleniyor
+   
+    -- Genre ekleme
+    LibraryPkg.AddGenre(1, 'Adventure');  -- Adventure türü ekleniyor
+   
+    -- BookGenres ekleme
+    LibraryPkg.AddBookGenre(1, 1);  -- Kitap ID'si 1 ile tür ID'si 1 (Adventure) bağlantısı ekleniyor
+   
+    -- Kütüphaneci ekleme
+    LibraryPkg.AddLibrarian(1, 'Alice', 'Johnson', '9876543210', 'alice.johnson@example.com');
+   
+    -- İşlem ekleme
+    LibraryPkg.AddTransaction(1, 'INSERT', 'Books', 1, SYSDATE, 1);  -- Kitap ekleme işlemi
+   
+END;
