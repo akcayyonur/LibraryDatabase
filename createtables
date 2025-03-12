@@ -1,0 +1,100 @@
+Table Users {
+  UserID integer [primary key]
+  F_Name varchar(100)
+  L_Name varchar(100)
+  Email varchar(100) [unique]
+  Phone varchar(15)
+  Address varchar(255)
+}
+
+
+Table Authors {
+  AuthorID integer [primary key]
+  Auth_Name varchar(100) [not null]
+  Auth_LName varchar(100) [not null]
+  Biography text
+}
+
+
+Table Publishers {
+  PublisherID integer [primary key]
+  PublisherName varchar(100) [not null]
+  Contact varchar(50)
+  CategoryID integer [not null]
+}
+
+
+Table Books {
+  BookID integer [primary key]
+  Title varchar(200) [not null]
+  AuthorID integer [not null]
+  PublisherID integer [not null]
+  ISBN varchar(13) [unique]
+  Year integer
+}
+
+
+Table Categories {
+  CategoryID integer [primary key]
+  CategoryName varchar(100) [unique, not null]
+}
+
+
+Table Loans {
+  LoanID integer [primary key]
+  UserID integer [not null]
+  BookID integer [not null]
+  IssueDate date [not null]
+  DueDate date [not null]
+  ReturnDate date
+}
+
+
+Table Reservations {
+  ReservationID integer [primary key]
+  UserID integer [not null]
+  BookID integer [not null]
+  Resrv_Date date [not null]
+}
+
+
+Table Fines {
+  FineID integer [primary key]
+  LoanID integer [not null]
+  Amount decimal(10, 2) [not null]
+  Status varchar(20)
+  // Check Status values: 'Paid', 'Unpaid'
+}
+
+
+Table Genres {
+  GenreID integer [primary key]
+  GenreName varchar(100) [unique, not null]
+}
+
+
+Table BookGenres {
+  BookID integer [not null]
+  GenreID integer [not null]
+  primary key (BookID, GenreID)
+}
+
+
+Table Librarians {
+  LibrarianID integer [primary key]
+  Libn_Name varchar(100) [not null]
+  Lib_LName varchar(100) [not null]
+  Phone varchar(15)
+  Email varchar(100) [unique, not null]
+}
+
+
+Table Transactions {
+  TransactionID integer [primary key]
+  Operation varchar(20) [not null]
+  // Operation should be one of: 'INSERT', 'UPDATE', 'DELETE'
+  TableName varchar(100) [not null]
+  RecordID integer [not null]
+  Timestamp date [default: 'SYSDATE', not null]
+  LibrarianID integer [not null]
+}
