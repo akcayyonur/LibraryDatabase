@@ -1,0 +1,81 @@
+-- Users tablosu için Primary Key
+ALTER TABLE Users ADD CONSTRAINT PK_Users PRIMARY KEY (UserID);
+
+-- Books tablosu için Primary Key
+ALTER TABLE Books ADD CONSTRAINT PK_Books PRIMARY KEY (BookID);
+
+-- Categories tablosu için Primary Key
+ALTER TABLE Categories ADD CONSTRAINT PK_Categories PRIMARY KEY (CategoryID);
+
+-- Authors tablosu için Primary Key
+ALTER TABLE Authors ADD CONSTRAINT PK_Authors PRIMARY KEY (AuthorID);
+
+-- Publishers tablosu için Primary Key
+ALTER TABLE Publishers ADD CONSTRAINT PK_Publishers PRIMARY KEY (PublisherID);
+
+-- Loans tablosu için Primary Key
+ALTER TABLE Loans ADD CONSTRAINT PK_Loans PRIMARY KEY (LoanID);
+
+-- Reservations tablosu için Primary Key
+ALTER TABLE Reservations ADD CONSTRAINT PK_Reservations PRIMARY KEY (ReservationID);
+
+-- Fines tablosu için Primary Key
+ALTER TABLE Fines ADD CONSTRAINT PK_Fines PRIMARY KEY (FineID);
+
+-- Genres tablosu için Primary Key
+ALTER TABLE Genres ADD CONSTRAINT PK_Genres PRIMARY KEY (GenreID);
+
+-- BookGenres tablosu için Composite Primary Key
+ALTER TABLE BookGenres ADD CONSTRAINT PK_BookGenres PRIMARY KEY (BookID, GenreID);
+
+-- Librarians tablosu için Primary Key
+ALTER TABLE Librarians ADD CONSTRAINT PK_Librarians PRIMARY KEY (LibrarianID);
+
+-- Transactions tablosu için Primary Key
+ALTER TABLE Transactions ADD CONSTRAINT PK_Transactions PRIMARY KEY (TransactionID);
+
+-- Books -> Authors
+ALTER TABLE Books ADD CONSTRAINT FK_Books_Authors FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID);
+
+-- Books -> Publishers
+ALTER TABLE Books ADD CONSTRAINT FK_Books_Publishers FOREIGN KEY (PublisherID) REFERENCES Publishers(PublisherID);
+
+-- Books -> Categories
+ALTER TABLE Books ADD CONSTRAINT FK_Books_Categories FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID);
+
+-- Loans -> Users
+ALTER TABLE Loans ADD CONSTRAINT FK_Loans_Users FOREIGN KEY (UserID) REFERENCES Users(UserID);
+
+-- Loans -> Books
+ALTER TABLE Loans ADD CONSTRAINT FK_Loans_Books FOREIGN KEY (BookID) REFERENCES Books(BookID);
+
+-- Reservations -> Users
+ALTER TABLE Reservations ADD CONSTRAINT FK_Reservations_Users FOREIGN KEY (UserID) REFERENCES Users(UserID);
+
+-- Reservations -> Books
+ALTER TABLE Reservations ADD CONSTRAINT FK_Reservations_Books FOREIGN KEY (BookID) REFERENCES Books(BookID);
+
+-- Fines -> Loans
+ALTER TABLE Fines ADD CONSTRAINT FK_Fines_Loans FOREIGN KEY (LoanID) REFERENCES Loans(LoanID);
+
+-- BookGenres -> Books
+ALTER TABLE BookGenres ADD CONSTRAINT FK_BookGenres_Books FOREIGN KEY (BookID) REFERENCES Books(BookID);
+
+-- BookGenres -> Genres
+ALTER TABLE BookGenres ADD CONSTRAINT FK_BookGenres_Genres FOREIGN KEY (GenreID) REFERENCES Genres(GenreID);
+
+-- Transactions -> Librarians
+ALTER TABLE Transactions ADD CONSTRAINT FK_Transactions_Librarians FOREIGN KEY (LibrarianID) REFERENCES Librarians(LibrarianID);
+
+-- BookGenres tablosunda Composite Primary Key (BookID, GenreID)
+ALTER TABLE BookGenres ADD CONSTRAINT PK_BookGenres PRIMARY KEY (BookID, GenreID);
+
+-- Users -> Email
+ALTER TABLE Users ADD CONSTRAINT UQ_Users_Email UNIQUE (Email);
+
+-- Books -> ISBN
+ALTER TABLE Books ADD CONSTRAINT UQ_Books_ISBN UNIQUE (ISBN);
+
+-- Genres -> GenreName
+ALTER TABLE Genres ADD CONSTRAINT UQ_Genres_GenreName UNIQUE (GenreName);
+
