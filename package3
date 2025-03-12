@@ -1,0 +1,32 @@
+-- Kullanıcı silme prosedürü
+PROCEDURE DeleteUser(p_user_id IN NUMBER);
+
+-- Kitap silme prosedürü
+PROCEDURE DeleteBook(p_book_id IN NUMBER);
+
+-- Yazar silme prosedürü
+PROCEDURE DeleteAuthor(p_author_id IN NUMBER);
+
+-- Yayınevi silme prosedürü
+PROCEDURE DeletePublisher(p_publisher_id IN NUMBER);
+
+-- Kategori silme prosedürü
+PROCEDURE DeleteCategory(p_category_id IN NUMBER);
+
+
+-- Rezervasyon silme prosedürü
+PROCEDURE DeleteReservation(p_reservation_id IN NUMBER);
+
+PROCEDURE DeleteGenre(p_genre_id IN NUMBER);
+
+PROCEDURE DeleteFine(p_fine_id IN NUMBER);
+
+PROCEDURE DeleteBookGenre(p_book_id IN NUMBER, p_genre_id IN NUMBER);
+-- Ödünç verme (Loan) silme prosedürü
+PROCEDURE DeleteLoan(p_loan_id IN NUMBER);
+
+--Librarain Delete
+PROCEDURE DeleteLibrarian(p_librarian_id IN NUMBER);
+
+--Transaction delete
+PROCEDURE DeleteTransaction(p_transaction_id IN NUMBER);
