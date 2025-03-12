@@ -15,3 +15,7 @@ few of the many responsibilities that the LDMS is made to handle. In order to re
 error and improve operational efficiency, the project also makes sure that all crucial database
 operations—such as data insertion, updating, and deletion—are automated using PL/SQL
 packages, functions, and triggers.
+
+
+ER DIAGRAM
+![table](https://github.com/user-attachments/assets/4294a978-c9fa-4bdb-9d7b-080a57025cd8)
