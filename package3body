@@ -1,0 +1,296 @@
+BEGIN
+        UPDATE Transactions
+        SET Operation = p_Operation, TableName = p_TableName, RecordID = p_RecordID, Timestamp = p_Timestamp, LibrarianID = p_LibrarianID
+        WHERE TransactionID = p_TransactionID;
+    END UpdateTransaction;
+
+
+    -- Kullanıcıyı silme prosedürü
+    PROCEDURE DeleteUser(p_user_id IN NUMBER) IS
+        v_user_exists NUMBER;
+    BEGIN
+        -- Kullanıcı var mı kontrol et
+        SELECT COUNT(*) INTO v_user_exists
+        FROM Users
+        WHERE UserID = p_user_id;
+
+        IF v_user_exists = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Böyle bir kullanıcı ID''si yok.');
+        ELSE
+            -- Fines tablosundaki cezalar silinsin
+            DELETE FROM Fines WHERE LoanID IN (SELECT LoanID FROM Loans WHERE UserID = p_user_id);
+            DBMS_OUTPUT.PUT_LINE('Fines for UserID ' || p_user_id || ' deleted.');
+
+            -- Loans tablosundaki ödünç alınan kitaplar silinsin
+            DELETE FROM Loans WHERE UserID = p_user_id;
+            DBMS_OUTPUT.PUT_LINE('Loans for UserID ' || p_user_id || ' deleted.');
+
+            -- Reservations tablosundaki rezervasyonlar silinsin
+            DELETE FROM Reservations WHERE UserID = p_user_id;
+            DBMS_OUTPUT.PUT_LINE('Reservations for UserID ' || p_user_id || ' deleted.');
+
+            -- Kullanıcıyı Users tablosundan sil
+            DELETE FROM Users WHERE UserID = p_user_id;
+            DBMS_OUTPUT.PUT_LINE('User with ID ' || p_user_id || ' deleted.');
+        END IF;
+    END DeleteUser;
+
+    -- Kitap silme prosedürü
+    PROCEDURE DeleteBook(p_book_id IN NUMBER) IS
+        v_book_exists NUMBER;
+    BEGIN
+        -- Kitap var mı kontrol et
+        SELECT COUNT(*) INTO v_book_exists
+        FROM Books
+        WHERE BookID = p_book_id;
+
+        IF v_book_exists = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Böyle bir kitap ID''si yok.');
+        ELSE
+            -- BookGenres tablosundaki kitap-genre ilişkisini sil
+            DELETE FROM BookGenres WHERE BookID = p_book_id;
+            DBMS_OUTPUT.PUT_LINE('Book-Genre relationship for BookID ' || p_book_id || ' deleted.');
+
+            -- Fines tablosundaki cezalar silinsin
+            DELETE FROM Fines WHERE LoanID IN (SELECT LoanID FROM Loans WHERE BookID = p_book_id);
+            DELETE FROM Loans WHERE BookID = p_book_id;
+            DBMS_OUTPUT.PUT_LINE('Loans and Fines for BookID ' || p_book_id || ' deleted.');
+
+            -- Reservations tablosundaki rezervasyonlar silinsin
+            DELETE FROM Reservations WHERE BookID = p_book_id;
+            DBMS_OUTPUT.PUT_LINE('Reservations for BookID ' || p_book_id || ' deleted.');
+
+
+            -- Kitap kaydını Books tablosundan sil
+            DELETE FROM Books WHERE BookID = p_book_id;
+            DBMS_OUTPUT.PUT_LINE('Book with ID ' || p_book_id || ' deleted.');
+        END IF;
+    END DeleteBook;
+
+    PROCEDURE DeleteAuthor(p_author_id IN NUMBER) IS
+    v_author_exists NUMBER;
+    v_book_id NUMBER;
+BEGIN
+    -- Yazar var mı kontrol et
+    SELECT COUNT(*) INTO v_author_exists
+    FROM Authors
+    WHERE AuthorID = p_author_id;
+
+    IF v_author_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir yazar ID''si yok.');
+    ELSE
+        -- 1. Yazarın kitaplarını al ve her bir kitabı DeleteBook fonksiyonu ile sil
+        FOR r IN (SELECT BookID FROM Books WHERE AuthorID = p_author_id) LOOP
+            v_book_id := r.BookID;  -- Kitap ID'sini al
+            DeleteBook(v_book_id);   -- Kitapları sil
+        END LOOP;
+
+        -- 2. Yazar kaydını Authors tablosundan sil
+        DELETE FROM Authors WHERE AuthorID = p_author_id;
+        DBMS_OUTPUT.PUT_LINE('Author with ID ' || p_author_id || ' deleted.');
+    END IF;
+END DeleteAuthor;
+
+PROCEDURE DeletePublisher(p_publisher_id IN NUMBER) IS
+    v_publisher_exists NUMBER;
+    v_book_id NUMBER;
+BEGIN
+    -- Yayımcı var mı kontrol et
+    SELECT COUNT(*) INTO v_publisher_exists
+    FROM Publishers
+    WHERE PublisherID = p_publisher_id;
+
+    IF v_publisher_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir yayımlayıcı ID''si yok.');
+    ELSE
+        -- 1. Yayımcıya ait kitapları al ve her birini DeleteBook fonksiyonu ile sil
+        FOR r IN (SELECT BookID FROM Books WHERE PublisherID = p_publisher_id) LOOP
+            v_book_id := r.BookID;  -- Kitap ID'sini al
+            DeleteBook(v_book_id);   -- Kitapları sil
+        END LOOP;
+
+        -- 2. Yayımcı kaydını Publishers tablosundan sil
+        DELETE FROM Publishers WHERE PublisherID = p_publisher_id;
+        DBMS_OUTPUT.PUT_LINE('Publisher with ID ' || p_publisher_id || ' deleted.');
+    END IF;
+END DeletePublisher;
+
+
+PROCEDURE DeleteCategory(p_category_id IN NUMBER) IS
+    v_category_exists NUMBER;
+BEGIN
+    -- Kategori var mı kontrol et
+    SELECT COUNT(*) INTO v_category_exists
+    FROM Categories
+    WHERE CategoryID = p_category_id;
+
+    IF v_category_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir kategori ID''si yok.');
+    ELSE
+        -- Category kaydını Categories tablosundan sil
+        DELETE FROM Categories WHERE CategoryID = p_category_id;
+        DBMS_OUTPUT.PUT_LINE('Category with ID ' || p_category_id || ' deleted.');
+    END IF;
+END DeleteCategory;
+
+ PROCEDURE DeleteLoan(p_loan_id IN NUMBER) IS
+    v_loan_exists NUMBER;
+    v_user_id NUMBER;
+    v_book_id NUMBER;
+    BEGIN
+    -- Loan var mı kontrol et
+    SELECT COUNT(*) INTO v_loan_exists
+    FROM Loans
+    WHERE LoanID = p_loan_id;
+
+    IF v_loan_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir Loan ID''si yok.');
+    ELSE
+        -- LoanID'ye ait UserID ve BookID'yi al
+        SELECT UserID, BookID INTO v_user_id, v_book_id
+        FROM Loans
+        WHERE LoanID = p_loan_id;
+
+        -- Fines tablosundaki cezaları sil
+        DELETE FROM Fines WHERE LoanID = p_loan_id;
+        DBMS_OUTPUT.PUT_LINE('Fines for LoanID ' || p_loan_id || ' deleted.');
+
+        -- Kullanıcıyı silmek için DeleteUser fonksiyonunu çağır
+        DeleteUser(v_user_id);  -- Kullanıcıyı sil
+
+        -- Kitabı silmek için DeleteBook fonksiyonunu çağır
+        DeleteBook(v_book_id);  -- Kitabı sil
+
+        -- Loan kaydını Loans tablosundan sil
+        DELETE FROM Loans WHERE LoanID = p_loan_id;
+        DBMS_OUTPUT.PUT_LINE('Loan with ID ' || p_loan_id || ' deleted.');
+    END IF;
+END DeleteLoan;
+
+PROCEDURE DeleteReservation(p_reservation_id IN NUMBER) IS
+    v_reservation_exists NUMBER;
+    v_user_id NUMBER;
+    v_book_id NUMBER;
+BEGIN
+    -- Rezervasyon var mı kontrol et
+    SELECT COUNT(*) INTO v_reservation_exists
+    FROM Reservations
+    WHERE ReservationID = p_reservation_id;
+
+    IF v_reservation_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir rezervasyon ID''si yok.');
+    ELSE
+        -- 1. Rezervasyona ait UserID ve BookID'yi al
+        SELECT UserID, BookID
+        INTO v_user_id, v_book_id
+        FROM Reservations
+        WHERE ReservationID = p_reservation_id;
+
+        -- 2. UserID'ye bağlı işlemi başlat (DeleteUser fonksiyonu çağrılacak)
+        DeleteUser(v_user_id);  -- Kullanıcıyı sil
+
+        -- 3. BookID'ye bağlı işlemi başlat (DeleteBook fonksiyonu çağrılacak)
+        DeleteBook(v_book_id);  -- Kitapları sil
+
+        -- 4. Rezervasyonu Reservations tablosundan sil
+        DELETE FROM Reservations WHERE ReservationID = p_reservation_id;
+        DBMS_OUTPUT.PUT_LINE('Reservation with ID ' || p_reservation_id || ' deleted.');
+    END IF;
+END DeleteReservation;
+
+ PROCEDURE DeleteFine(p_fine_id IN NUMBER) IS
+    v_fine_exists NUMBER;
+BEGIN
+    -- Cezanın var olup olmadığını kontrol et
+    SELECT COUNT(*) INTO v_fine_exists
+    FROM Fines
+    WHERE FineID = p_fine_id;
+
+    IF v_fine_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir ceza ID''si yok.');
+    ELSE
+        -- Fine silme işlemi
+        DELETE FROM Fines WHERE FineID = p_fine_id;
+        DBMS_OUTPUT.PUT_LINE('Fine with ID ' || p_fine_id || ' deleted.');
+    END IF;
+END DeleteFine;
+
+PROCEDURE DeleteGenre(p_genre_id IN NUMBER) IS
+    v_genre_exists NUMBER;
+BEGIN
+    -- Genre'nin var olup olmadığını kontrol et
+    SELECT COUNT(*) INTO v_genre_exists
+    FROM Genres
+    WHERE GenreID = p_genre_id;
+
+    IF v_genre_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir genre ID''si yok.');
+    ELSE
+        -- BookGenres tablosundaki genre ile ilişkili kitapları sil
+        DELETE FROM BookGenres WHERE GenreID = p_genre_id;
+        DBMS_OUTPUT.PUT_LINE('Book-Genre relationships for GenreID ' || p_genre_id || ' deleted.');
+
+        -- Genre'yi sil
+        DELETE FROM Genres WHERE GenreID = p_genre_id;
+        DBMS_OUTPUT.PUT_LINE('Genre with ID ' || p_genre_id || ' deleted.');
+    END IF;
+END DeleteGenre;
+
+PROCEDURE DeleteBookGenre(p_book_id IN NUMBER, p_genre_id IN NUMBER) IS
+    v_relationship_exists NUMBER;
+BEGIN
+    -- Kitap ve genre ilişkisini kontrol et
+    SELECT COUNT(*) INTO v_relationship_exists
+    FROM BookGenres
+    WHERE BookID = p_book_id AND GenreID = p_genre_id;
+
+    IF v_relationship_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir kitap-genre ilişkisi yok.');
+    ELSE
+        -- Kitap-Genre ilişkisini sil
+        DELETE FROM BookGenres WHERE BookID = p_book_id AND GenreID = p_genre_id;
+        DBMS_OUTPUT.PUT_LINE('Book-Genre relationship for BookID ' || p_book_id || ' and GenreID ' || p_genre_id || ' deleted.');
+    END IF;
+END DeleteBookGenre;
+
+PROCEDURE DeleteLibrarian(p_librarian_id IN NUMBER) IS
+    v_librarian_exists NUMBER;
+BEGIN
+    -- Kütüphaneci var mı kontrol et
+    SELECT COUNT(*) INTO v_librarian_exists
+    FROM Librarians
+    WHERE LibrarianID = p_librarian_id;
+
+    IF v_librarian_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir kütüphaneci ID''si yok.');
+    ELSE
+        -- Librarian ile ilişkili Transactions tablosundaki işlemleri sil
+        DELETE FROM Transactions WHERE LibrarianID = p_librarian_id;
+        DBMS_OUTPUT.PUT_LINE('Transactions related to LibrarianID ' || p_librarian_id || ' deleted.');
+
+        -- Kütüphaneci kaydını sil
+        DELETE FROM Librarians WHERE LibrarianID = p_librarian_id;
+        DBMS_OUTPUT.PUT_LINE('Librarian with ID ' || p_librarian_id || ' deleted.');
+    END IF;
+END DeleteLibrarian;
+
+PROCEDURE DeleteTransaction(p_transaction_id IN NUMBER) IS
+    v_transaction_exists NUMBER;
+BEGIN
+    -- İşlem var mı kontrol et
+    SELECT COUNT(*) INTO v_transaction_exists
+    FROM Transactions
+    WHERE TransactionID = p_transaction_id;
+
+    IF v_transaction_exists = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Böyle bir işlem ID''si yok.');
+    ELSE
+        -- TransactionID ile ilişkili işlemi sil
+        DELETE FROM Transactions WHERE TransactionID = p_transaction_id;
+        DBMS_OUTPUT.PUT_LINE('Transaction with ID ' || p_transaction_id || ' deleted.');
+    END IF;
+END DeleteTransaction;
+
+
+
+END LibraryPkg;
