@@ -1,0 +1,153 @@
+--Kullanıcı Güncelleme Prosedürü
+    PROCEDURE UpdateUser (
+        p_UserID IN NUMBER,
+        p_F_Name IN VARCHAR2,
+        p_L_Name IN VARCHAR2,
+        p_Email IN VARCHAR2,
+        p_Phone IN VARCHAR2,
+        p_Address IN VARCHAR2
+    ) IS
+    BEGIN
+        UPDATE Users
+        SET F_Name = p_F_Name, L_Name = p_L_Name, Email = p_Email, Phone = p_Phone, Address = p_Address
+        WHERE UserID = p_UserID;
+    END UpdateUser;
+
+    -- Yazar Güncelleme Prosedürü
+    PROCEDURE UpdateAuthor (
+        p_AuthorID IN NUMBER,
+        p_Auth_Name IN VARCHAR2,
+        p_Auth_LName IN VARCHAR2,
+        p_Biography IN CLOB
+    ) IS
+    BEGIN
+        UPDATE Authors
+        SET Auth_Name = p_Auth_Name, Auth_LName = p_Auth_LName, Biography = p_Biography
+        WHERE AuthorID = p_AuthorID;
+    END UpdateAuthor;
+
+    -- Yayıncı Güncelleme Prosedürü
+    PROCEDURE UpdatePublisher (
+        p_PublisherID IN NUMBER,
+        p_PublisherName IN VARCHAR2,
+        p_Contact IN VARCHAR2,
+        p_CategoryID IN NUMBER
+    ) IS
+    BEGIN
+        UPDATE Publishers
+        SET PublisherName = p_PublisherName, Contact = p_Contact, CategoryID= p_CategoryID 
+        WHERE PublisherID = p_PublisherID;
+    END UpdatePublisher;
+
+    -- Kategori Güncelleme Prosedürü
+    PROCEDURE UpdateCategory (
+        p_CategoryID IN NUMBER,
+        p_CategoryName IN VARCHAR2
+    ) IS
+    BEGIN
+        UPDATE Categories
+        SET CategoryName = p_CategoryName
+        WHERE CategoryID = p_CategoryID;
+    END UpdateCategory;
+
+    -- Kitap Güncelleme Prosedürü
+    PROCEDURE UpdateBook (
+        p_BookID IN NUMBER,
+        p_Title IN VARCHAR2,
+        p_AuthorID IN NUMBER,
+        p_PublisherID IN NUMBER,
+        p_ISBN IN VARCHAR2,
+        p_Year IN NUMBER
+    ) IS
+    BEGIN
+        UPDATE Books
+        SET Title = p_Title, AuthorID = p_AuthorID, PublisherID = p_PublisherID, ISBN = p_ISBN, Year = p_Year
+        WHERE BookID = p_BookID;
+    END UpdateBook;
+
+    -- Kitap Türü Güncelleme Prosedürü
+    PROCEDURE UpdateGenre (
+        p_GenreID IN NUMBER,
+        p_GenreName IN VARCHAR2
+    ) IS
+    BEGIN
+        UPDATE Genres
+        SET GenreName = p_GenreName
+        WHERE GenreID = p_GenreID;
+    END UpdateGenre;
+
+    -- Kitap-Genre Bağlantısı Güncelleme Prosedürü
+    PROCEDURE UpdateBookGenre (
+        p_BookID IN NUMBER,
+        p_GenreID IN NUMBER
+    ) IS
+    BEGIN
+        UPDATE BookGenres
+        SET GenreID = p_GenreID
+        WHERE BookID = p_BookID;
+    END UpdateBookGenre;
+
+    -- Ödünç Alma Güncelleme Prosedürü
+    PROCEDURE UpdateLoan (
+        p_LoanID IN NUMBER,
+        p_UserID IN NUMBER,
+        p_BookID IN NUMBER,
+        p_IssueDate IN DATE,
+        p_DueDate IN DATE,
+        p_ReturnDate IN DATE
+    ) IS
+    BEGIN
+        UPDATE Loans
+        SET UserID = p_UserID, BookID = p_BookID, IssueDate = p_IssueDate, DueDate = p_DueDate, ReturnDate = p_ReturnDate
+        WHERE LoanID = p_LoanID;
+    END UpdateLoan;
+
+    -- Rezervasyon Güncelleme Prosedürü
+    PROCEDURE UpdateReservation (
+        p_ReservationID IN NUMBER,
+        p_UserID IN NUMBER,
+        p_BookID IN NUMBER,
+        p_Resrv_Date IN DATE
+    ) IS
+    BEGIN
+        UPDATE Reservations
+        SET UserID = p_UserID, BookID = p_BookID, Resrv_Date = p_Resrv_Date
+        WHERE ReservationID = p_ReservationID;
+    END UpdateReservation;
+
+    -- Ceza Güncelleme Prosedürü
+    PROCEDURE UpdateFine (
+        p_FineID IN NUMBER,
+        p_LoanID IN NUMBER,
+        p_Amount IN NUMBER,
+        p_Status IN VARCHAR2
+    ) IS
+    BEGIN
+        UPDATE Fines
+        SET Amount = p_Amount, Status = p_Status
+        WHERE FineID = p_FineID;
+    END UpdateFine;
+
+    -- Kütüphaneci Güncelleme Prosedürü
+    PROCEDURE UpdateLibrarian (
+        p_LibrarianID IN NUMBER,
+        p_Libn_Name IN VARCHAR2,
+        p_Lib_LName IN VARCHAR2,
+        p_Phone IN VARCHAR2,
+        p_Email IN VARCHAR2
+    ) IS
+    BEGIN
+        UPDATE Librarians
+        SET Libn_Name = p_Libn_Name, Lib_LName = p_Lib_LName, Phone = p_Phone, Email = p_Email
+        WHERE LibrarianID = p_LibrarianID;
+    END UpdateLibrarian;
+
+    -- İşlem Güncelleme Prosedürü
+    PROCEDURE UpdateTransaction (
+        p_TransactionID IN NUMBER,
+        p_Operation IN VARCHAR2,
+        p_TableName IN VARCHAR2,
+        p_RecordID IN NUMBER,
+        p_Timestamp IN DATE,
+        p_LibrarianID IN NUMBER
+    ) IS
